@@ -1,0 +1,17 @@
+{
+  "name": "orc",
+  "owner": {
+    "name": "Orc Project",
+    "url": "https://github.com/randalmurphal/orc"
+  },
+  "metadata": {
+    "description": "Task orchestration plugins for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "orc",
+      "source": "./orc",
+      "description": "Task orchestration commands for multi-phase Claude workflows"
+    }
+  ]
+}
