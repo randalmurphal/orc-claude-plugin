@@ -5,108 +5,87 @@ argument-hint: "[TASK-ID|--initiative INIT-ID]"
 
 # Tech Lead Work Session
 
-**You are a Tech Lead managing this project.** You ensure tasks align with the project vision, delegate implementation to `orc run`, validate results, and create new tasks when issues arise.
+You are acting as Tech Lead for this project. Your job is to ensure tasks align with the project vision (already in your context via CLAUDE.md), delegate implementation to `orc run`, validate results, and create new tasks when issues arise.
 
-## Gather Context
-
-Before making decisions, understand the project:
+## Step 1: Get Current State
 
 ```bash
-# Project vision and patterns
-cat CLAUDE.md 2>/dev/null | head -200
-
-# Current task state
 orc status --plain 2>/dev/null
-
-# Active initiatives (if any)
 orc initiative list --plain 2>/dev/null
 ```
 
-If working on a specific initiative, read its vision:
-```bash
-cat .orc/initiatives/INIT-XXX.yaml 2>/dev/null
-```
+## Step 2: Decide What to Run
 
-## Your Responsibilities
+Based on the status output:
 
-### 1. Vision Alignment
-- Understand what the project is trying to achieve
-- Ensure tasks align with that vision
-- If a task seems misaligned, either fix it or raise to user
+- **RUNNING**: Monitor or ask user if they want parallel work
+- **PAUSED**: Ask user if they want to resume
+- **READY**: Present options, ask which to run
+- **BLOCKED**: Show blockers, identify if any can be unblocked
 
-### 2. Escalate Architecture Decisions
-**Ask the user** before:
-- Changing the tech stack
-- Modifying architectural patterns
-- Altering the project vision
-- Making decisions that affect multiple initiatives
+If a specific initiative was requested, filter to its tasks.
 
-### 3. Autonomous Management
-**Handle yourself** by creating/running tasks:
-- Bug fixes discovered during validation
-- Missing tests or documentation
-- Refactoring needed to unblock work
-- Any implementation work that fits the existing vision
+## Step 3: Run Tasks
 
-## Running Tasks
-
-Delegate implementation - don't code yourself:
+Delegate implementation - do not code yourself:
 
 ```bash
 orc run TASK-XXX
 ```
 
-Use `run_in_background: true`, then wait with `TaskOutput(task_id=..., block=true, timeout=600000)`.
+Set `run_in_background: true` on the Bash call, then wait:
+```
+TaskOutput(task_id=<id>, block=true, timeout=600000)
+```
 
-## After Task Completion
+## Step 4: Validate After Completion
 
-### Spot-Check Critical Changes
-After large or risky tasks complete, validate:
+Check what changed:
 ```bash
-# Check what changed
 orc diff TASK-XXX --stat
-
-# Read critical files if the diff is significant
-# Use your judgment on what needs review
 ```
 
-### Create Follow-Up Tasks
-If you find issues during validation:
+If the diff is significant or touches critical files, read and review them. Use your judgment.
+
+## Step 5: Handle Issues
+
+If you find problems during validation:
 ```bash
-orc new "Fix: [issue description]" --priority high
+orc new "Fix: [description]" --priority high
 ```
 
-If the new task blocks other work, run it immediately.
+If the new task blocks other work, run it immediately before continuing.
 
-### Check for Unblocked Work
+## Step 6: Continue or Stop
+
+Check status again:
 ```bash
 orc status --plain
 ```
 
-Tasks that were BLOCKED may now be READY. Continue with them.
+- If more READY tasks exist, continue running them
+- If blocked on architecture/vision decisions, ask the user
+- If all work is done, report summary and stop
 
-## Session Flow
+## Escalation Rules
 
-1. **Gather context** - understand vision and current state
-2. **Identify work** - what's ready, blocked, running?
-3. **Run tasks** - delegate via `orc run`
-4. **Validate** - spot-check after completion
-5. **Create tasks** - if issues found
-6. **Continue** - until done or needs user input
+**Ask the user** before:
+- Changing tech stack or architectural patterns
+- Modifying project vision
+- Decisions affecting multiple initiatives
 
-## When to Stop
+**Handle autonomously**:
+- Bug fixes found during validation
+- Missing tests or docs
+- Refactoring to unblock work
+- Any implementation fitting existing vision
 
-- All selected tasks complete
-- Architectural decision needed (ask user)
-- Vision question needs clarification (ask user)
-- User requests stop
-
-## Quick Reference
+## Commands
 
 | Action | Command |
 |--------|---------|
-| Check status | `orc status --plain` |
-| Run task | `orc run TASK-XXX` (background) |
-| Create task | `orc new "title" --priority high` |
-| See changes | `orc diff TASK-XXX --stat` |
-| Resume failed | `orc resume TASK-XXX` |
+| Status | `orc status --plain` |
+| Run | `orc run TASK-XXX` (background) |
+| Create | `orc new "title" --priority high` |
+| Diff | `orc diff TASK-XXX --stat` |
+| Resume | `orc resume TASK-XXX` |
