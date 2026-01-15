@@ -14,9 +14,19 @@ orc status --plain 2>/dev/null
 orc initiative list --plain 2>/dev/null
 ```
 
+Check recent progress for context:
+```bash
+orc list --status completed --limit 5 --plain 2>/dev/null
+```
+
+If tasks belong to an initiative, understand it:
+```bash
+cat .orc/initiatives/INIT-XXX.yaml 2>/dev/null
+```
+
 ## Step 2: Decide What to Run
 
-Based on the status output:
+Based on status output:
 
 - **RUNNING**: Monitor or ask user if they want parallel work
 - **PAUSED**: Ask user if they want to resume
@@ -33,16 +43,14 @@ Delegate implementation - do not code yourself:
 orc run TASK-XXX
 ```
 
-Set `run_in_background: true` on the Bash call, then wait:
-```
-TaskOutput(task_id=<id>, block=true, timeout=600000)
-```
+Set `run_in_background: true` on the Bash call, then **stop and wait**. You will be notified when the background task completes - no need to poll or use TaskOutput.
 
 ## Step 4: Validate After Completion
 
-Check what changed:
+When notified of completion, check what changed:
 ```bash
 orc diff TASK-XXX --stat
+orc show TASK-XXX --plain
 ```
 
 If the diff is significant or touches critical files, read and review them. Use your judgment.
@@ -85,7 +93,8 @@ orc status --plain
 | Action | Command |
 |--------|---------|
 | Status | `orc status --plain` |
-| Run | `orc run TASK-XXX` (background) |
+| Run | `orc run TASK-XXX` (background, then stop) |
 | Create | `orc new "title" --priority high` |
 | Diff | `orc diff TASK-XXX --stat` |
+| Show | `orc show TASK-XXX --plain` |
 | Resume | `orc resume TASK-XXX` |
