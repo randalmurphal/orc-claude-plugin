@@ -19,23 +19,36 @@ Check recent progress for context:
 orc list --status completed --limit 5 --plain 2>/dev/null
 ```
 
-If tasks belong to an initiative, understand it:
+## Step 2: Understand Task Context
+
+For READY tasks you're considering, check their scope:
+```bash
+cat .orc/tasks/TASK-XXX/task.yaml 2>/dev/null
+cat .orc/tasks/TASK-XXX/spec.md 2>/dev/null
+```
+
+If no spec exists and task belongs to an initiative, the initiative often has context:
 ```bash
 cat .orc/initiatives/INIT-XXX.yaml 2>/dev/null
 ```
 
-## Step 2: Decide What to Run
+## Step 3: Plan Execution (up to 3 parallel)
 
-Based on status output:
+Before running multiple tasks, check for conflicts:
 
-- **RUNNING**: Monitor or ask user if they want parallel work
-- **PAUSED**: Ask user if they want to resume
-- **READY**: Present options, ask which to run
-- **BLOCKED**: Show blockers, identify if any can be unblocked
+**Run serial if:**
+- Tasks modify the same files
+- Tasks touch the same component/module
+- One task depends on another
 
-If a specific initiative was requested, filter to its tasks.
+**Safe to parallelize:**
+- Tasks in different areas of the codebase
+- Independent bug fixes
+- Docs alongside code tasks
 
-## Step 3: Run Tasks
+Present your plan before executing.
+
+## Step 4: Run Tasks
 
 Delegate implementation - do not code yourself:
 
@@ -43,19 +56,27 @@ Delegate implementation - do not code yourself:
 orc run TASK-XXX
 ```
 
-Set `run_in_background: true` on the Bash call, then **stop and wait**. You will be notified when the background task completes - no need to poll or use TaskOutput.
-
-## Step 4: Validate After Completion
-
-When notified of completion, check what changed:
+For parallel execution (max 3):
 ```bash
+orc run TASK-001
+orc run TASK-002
+orc run TASK-003
+```
+
+Set `run_in_background: true` on each Bash call, then **stop and wait**. You will be notified when tasks complete.
+
+## Step 5: Validate After Completion
+
+When notified of completion:
+```bash
+orc status --plain 2>/dev/null
 orc diff TASK-XXX --stat
 orc show TASK-XXX --plain
 ```
 
-If the diff is significant or touches critical files, read and review them. Use your judgment.
+If the diff is significant or touches critical files, read and review them.
 
-## Step 5: Handle Issues
+## Step 6: Handle Issues
 
 If you find problems during validation:
 ```bash
@@ -64,16 +85,15 @@ orc new "Fix: [description]" --priority high
 
 If the new task blocks other work, run it immediately before continuing.
 
-## Step 6: Continue or Stop
+## Step 7: Continue or Stop
 
-Check status again:
 ```bash
 orc status --plain
 ```
 
-- If more READY tasks exist, continue running them
-- If blocked on architecture/vision decisions, ask the user
-- If all work is done, report summary and stop
+- More READY tasks? Plan next batch and continue
+- Blocked on architecture/vision decisions? Ask the user
+- All work done? Report summary and stop
 
 ## Escalation Rules
 
@@ -98,3 +118,4 @@ orc status --plain
 | Diff | `orc diff TASK-XXX --stat` |
 | Show | `orc show TASK-XXX --plain` |
 | Resume | `orc resume TASK-XXX` |
+| List by initiative | `orc list --initiative INIT-XXX` |
