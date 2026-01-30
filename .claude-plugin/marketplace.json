@@ -11,7 +11,7 @@
     {
       "name": "orc",
       "source": "./orc",
-      "description": "Task orchestration commands for multi-phase Claude workflows"
+      "description": "Task orchestration skills for multi-phase Claude workflows"
     }
   ]
 }

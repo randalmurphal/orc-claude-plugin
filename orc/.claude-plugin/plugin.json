@@ -1,8 +1,13 @@
 {
   "name": "orc",
-  "description": "Task orchestration for multi-phase Claude workflows. Create specs, run tasks, manage reviews and QA sessions.",
+  "description": "Task orchestration skills for Claude Code: brainstorming, TDD, debugging, verification, and orc task management",
+  "version": "1.0.0",
   "author": {
     "name": "Orc Project",
     "url": "https://github.com/randalmurphal/orc"
-  }
+  },
+  "homepage": "https://github.com/randalmurphal/orc",
+  "repository": "https://github.com/randalmurphal/orc-claude-plugin",
+  "license": "MIT",
+  "keywords": ["orc", "orchestration", "tdd", "brainstorming", "debugging", "tasks", "workflows"]
 }
